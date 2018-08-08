@@ -29,11 +29,22 @@ public class MainActivity extends AppCompatActivity {
 
     public void Move(View view) {
         ImageView pin = (ImageView) view;
-        MakeMove(pin);
-        MoveAnimation(pin);
-        if (checkGameState()) {
-            Toast.makeText(this, (moveTurn == 0) ? "X WON!" : "O WON!", Toast.LENGTH_SHORT).show();
+        if (getClickables(pin)) {
+            MakeMove(pin);
+            MoveAnimation(pin);
+            setClickables(pin);
+            if (checkGameState()) {
+                Toast.makeText(this, (moveTurn == 0) ? "X WON!" : "O WON!", Toast.LENGTH_SHORT).show();
+            }
         }
+    }
+
+    public void setClickables(ImageView imageView) {
+        clickables[Integer.parseInt(imageView.getTag().toString())] = false;
+    }
+
+    public boolean getClickables(ImageView imageView) {
+        return clickables[Integer.parseInt(imageView.getTag().toString())];
     }
 
     public void MakeMove(ImageView imageView) {
@@ -50,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
             boardState[Integer.parseInt(imageView.getTag().toString())] = moveTurn;
             moveTurn = 0;
         }
-        imageView.setClickable(false);
     }
 
     public void newButtonClick(View view) {
