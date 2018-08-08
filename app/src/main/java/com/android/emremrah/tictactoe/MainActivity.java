@@ -2,15 +2,21 @@ package com.android.emremrah.tictactoe;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    private int moveTurn = 0; // 0 means X
+    // 0 means X
+    private int moveTurn = 0;
     private boolean[] clickables = {true, true, true, true, true, true, true, true, true};
+
+    // 1'den 9'a numaralı yerlerde hangi taşların bulunduğunun kaydedilmesi
     private int[] boardState = {2, 2, 2, 2, 2, 2, 2, 2, 2};
+
+    // Bu numaralarda aynı tür taş bulunuyorsa, oyun bitmiş ve o taşın sahibi kazanmış demektir
     private int[][] winningStates = {
             {0, 1, 2}, {3, 4, 5}, {6, 7, 8},
             {0, 3, 6}, {1, 4, 7}, {2, 5, 8},
@@ -34,7 +40,10 @@ public class MainActivity extends AppCompatActivity {
             MoveAnimation(pin);
             setClickables(pin);
             if (checkGameState()) {
-                Toast.makeText(this, (moveTurn == 0) ? "X WON!" : "O WON!", Toast.LENGTH_SHORT).show();
+                endGame();
+            } else {
+                // Oyun bitmemişse oynama sırasını değiştir
+                moveTurn = (moveTurn==0) ? 1 : 0;
             }
         }
     }
@@ -54,12 +63,10 @@ public class MainActivity extends AppCompatActivity {
         if (moveTurn == 0) {
             imageView.setImageResource(R.drawable.x);
             boardState[Integer.parseInt(imageView.getTag().toString())] = moveTurn;
-            moveTurn = 1;
         }
         else {
             imageView.setImageResource(R.drawable.o);
             boardState[Integer.parseInt(imageView.getTag().toString())] = moveTurn;
-            moveTurn = 0;
         }
     }
 
@@ -69,12 +76,20 @@ public class MainActivity extends AppCompatActivity {
 
     public boolean checkGameState() {
         for (int[] winningState : winningStates) {
-            if (((boardState[winningState[0]] == boardState[winningState[1]]) && boardState[winningState[0]] != 2)
-                    && boardState[winningState[1]] == boardState[winningState[2]]) {
+            if (boardState[winningState[0]] == boardState[winningState[1]] &&
+                    boardState[winningState[1]] == boardState[winningState[2]] &&
+                    boardState[winningState[0]] != 2) {
                 return true;
             }
         }
         return false;
+    }
+
+    public void endGame() {
+        // Tüm hücreleri tıklanamaz yap
+        for (int i = 0; i < clickables.length; i++) clickables[i] = false;
+        
+        Toast.makeText(this, (moveTurn == 0) ? "X WON!" : "O WON!", Toast.LENGTH_SHORT).show();
     }
 
     public void MoveAnimation (ImageView imageView) {
