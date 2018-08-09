@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -26,11 +27,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        Initialize();
-    }
-
-    public void Initialize() {
     }
 
     public void Move(View view) {
@@ -48,12 +44,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void setClickables(ImageView imageView) {
-        clickables[Integer.parseInt(imageView.getTag().toString())] = false;
-    }
-
-    public boolean getClickables(ImageView imageView) {
-        return clickables[Integer.parseInt(imageView.getTag().toString())];
+    public void newGameClick(View view) {
+        resetGame(view);
     }
 
     public void MakeMove(ImageView imageView) {
@@ -70,8 +62,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void newButtonClick(View view) {
+    public void MoveAnimation (ImageView imageView) {
+        imageView.setTranslationY(-1500f);
+        imageView.setTranslationX(1000f);
+        imageView.animate().translationX(0f).translationY(0f).rotationBy(180f).setDuration(500);
+    }
 
+    public boolean getClickables(ImageView imageView) {
+        return clickables[Integer.parseInt(imageView.getTag().toString())];
+    }
+
+    public void setClickables(ImageView imageView) {
+        clickables[Integer.parseInt(imageView.getTag().toString())] = false;
     }
 
     public boolean checkGameState() {
@@ -88,13 +90,23 @@ public class MainActivity extends AppCompatActivity {
     public void endGame() {
         // Tüm hücreleri tıklanamaz yap
         for (int i = 0; i < clickables.length; i++) clickables[i] = false;
-        
+
         Toast.makeText(this, (moveTurn == 0) ? "X WON!" : "O WON!", Toast.LENGTH_SHORT).show();
     }
 
-    public void MoveAnimation (ImageView imageView) {
-        imageView.setTranslationY(-1500f);
-        imageView.setTranslationX(1000f);
-        imageView.animate().translationX(0f).translationY(0f).rotationBy(180f).setDuration(750);
+    public void resetGame(View view) {
+        for (int i = 0; i < clickables.length; i++) clickables[i] = true;
+        for (int i = 0; i < boardState.length; i++) boardState[i] = 2;
+        moveTurn = 0;
+
+        try {
+            android.support.v7.widget.GridLayout boardLayout = findViewById(R.id.boardLayout);
+            for (int i = 0; i < boardLayout.getChildCount(); i++) {
+                ((ImageView) boardLayout.getChildAt(i)).setImageResource(0);
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
     }
 }
